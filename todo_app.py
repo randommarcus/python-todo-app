@@ -12,8 +12,9 @@ def show_menu():
     print("1. Add a new task")
     print("2. View all tasks")
     print("3. Mark a task as complete")
-    print("4. Delete a task")
-    print("5. Exit")
+    print("4. Edit a task")
+    print("5. Delete a task")
+    print("6. Exit")
 
 def load_tasks_from_file(filename):
     """Loads tasks from a JSON file."""
@@ -50,6 +51,32 @@ def view_tasks(task_list):
         for index, task in enumerate(task_list):
             status_marker = "[x]" if task['status'] == 'complete' else "[ ]"
             print(f"{index + 1}. {status_marker} {task['description']}")
+
+def edit_task(task_list):
+    """Edits the description of an existing task."""
+    view_tasks(task_list)
+
+    if not task_list:
+        return # Exit the function if there are no tasks
+
+    try:
+        task_num = int(input("Enter the number of the task to edit: "))
+
+        if 1 <= task_num <= len(task_list):
+            # Get the correct index
+            task_index = task_num - 1
+
+            # Get the new description from the user
+            new_description = input(f"Enter the new description for task {task_num}: ")
+
+            # Update the dictionary
+            task_list[task_index]['description'] = new_description
+            print("Task updated successfully!")
+        else:
+            print("Invalid task number. Please try again.")
+
+    except ValueError:
+        print("Invalid input. Please enter a number.")
 
 def delete_task(task_list):
     """Deletes a task from the list."""
@@ -98,7 +125,7 @@ def mark_task_complete(task_list):
 # Main application loop
 while True:
     show_menu()
-    choice = input("Enter your choice (1-5): ")
+    choice = input("Enter your choice (1-6): ")
 
     if choice == '1':
         add_task(tasks)
@@ -109,9 +136,12 @@ while True:
         mark_task_complete(tasks)
         save_tasks_to_file(tasks, FILENAME) # Save changes after marking a task complete
     elif choice == '4':
+            edit_task(tasks)
+            save_tasks_to_file(tasks, FILENAME) # Save changes after editing
+    elif choice == '5':
             delete_task(tasks)
             save_tasks_to_file(tasks, FILENAME) # Save changes after deleting
-    elif choice == '5':
+    elif choice == '6':
         print("Exiting the To-Do List App. Goodbye!")
         break
     else:
