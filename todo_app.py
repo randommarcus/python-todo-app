@@ -1,3 +1,4 @@
+import datetime
 import json
 
 print("Hello, To-Do List!")
@@ -33,48 +34,81 @@ def save_tasks_to_file(task_list, filename):
         json.dump(task_list, f, indent=4)
 
 def add_task(task_list):
-    """Adds a new task (as a dictionary) to the list."""
+    """Adds a new task with a due date to the list."""
     description = input("Enter the new task description: ")
+    due_date_str = input("Enter the due date (YYYY-MM-DD), or leave blank for none: ")
+    
+    # Date validation
+    due_date = None
+    if due_date_str:
+        try:
+            # This line checks if the date is valid. It will raise a ValueError if not.
+            datetime.datetime.strptime(due_date_str, "%Y-%m-%d")
+            due_date = due_date_str
+        except ValueError:
+            print("Invalid date format. Task will be added without a due date.")
+            due_date = None # Ensure it's reset if format is wrong
+    
     new_task = {
         "description": description,
-        "status": "incomplete"
+        "status": "incomplete",
+        "due_date": due_date  # Can be the string or None
     }
     task_list.append(new_task)
     print(f"Task '{description}' has been added.")
 
+
 def view_tasks(task_list):
-    """Displays all tasks with their status."""
-    print("\nYour To-Do List:")
+    """Displays all tasks with their status and due date."""
+    print("\n--- Your To-Do List ---")
     if not task_list:
         print("Your to-do list is empty!")
     else:
         for index, task in enumerate(task_list):
             status_marker = "[x]" if task['status'] == 'complete' else "[ ]"
-            print(f"{index + 1}. {status_marker} {task['description']}")
+            # Get the due date, display 'No due date' if it's None
+            due_date = task.get('due_date', 'No due date')
+            if due_date is None:
+                due_date = 'No due date'
+
+            print(f"{index + 1}. {status_marker} {task['description']} (Due: {due_date})")
 
 def edit_task(task_list):
-    """Edits the description of an existing task."""
+    """Edits an existing task's description or due date."""
     view_tasks(task_list)
 
     if not task_list:
-        return # Exit the function if there are no tasks
+        return
 
     try:
         task_num = int(input("Enter the number of the task to edit: "))
 
         if 1 <= task_num <= len(task_list):
-            # Get the correct index
             task_index = task_num - 1
+            task = task_list[task_index]
 
-            # Get the new description from the user
-            new_description = input(f"Enter the new description for task {task_num}: ")
+            print(f"Editing task: {task['description']}")
+            print("What do you want to edit?")
+            print("1. Description")
+            print("2. Due Date")
+            choice = input("Enter your choice (1-2): ")
 
-            # Update the dictionary
-            task_list[task_index]['description'] = new_description
-            print("Task updated successfully!")
+            if choice == '1':
+                new_description = input("Enter the new description: ")
+                task['description'] = new_description
+                print("Description updated successfully!")
+            elif choice == '2':
+                new_due_date_str = input("Enter the new due date (YYYY-MM-DD): ")
+                try:
+                    datetime.datetime.strptime(new_due_date_str, "%Y-%m-%d")
+                    task['due_date'] = new_due_date_str
+                    print("Due date updated successfully!")
+                except ValueError:
+                    print("Invalid date format. Due date not changed.")
+            else:
+                print("Invalid choice.")
         else:
-            print("Invalid task number. Please try again.")
-
+            print("Invalid task number.")
     except ValueError:
         print("Invalid input. Please enter a number.")
 
