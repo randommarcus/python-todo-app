@@ -9,13 +9,14 @@ FILENAME = "tasks.json" # Define the filename as a constant
 
 def show_menu():
     """Displays the main menu to the user."""
-    print("\nWhat would you like to do?")
+    print("\n--- To-Do List Menu ---")
     print("1. Add a new task")
     print("2. View all tasks")
-    print("3. Mark a task as complete")
-    print("4. Edit a task")
-    print("5. Delete a task")
-    print("6. Exit")
+    print("3. View tasks sorted by due date")
+    print("4. Mark a task as complete")
+    print("5. Edit a task")
+    print("6. Delete a task")
+    print("7. Exit")
 
 def load_tasks_from_file(filename):
     """Loads tasks from a JSON file."""
@@ -156,10 +157,33 @@ def mark_task_complete(task_list):
     except ValueError:
         print("Invalid input. Please enter a number.")
 
+def view_sorted_tasks(task_list):
+    """Sorts tasks by due date and displays them."""
+    print("\n--- Tasks Sorted by Due Date ---")
+    
+    # We create a sorting key that handles tasks with no due date.
+    # We treat 'None' as a very large date string so it goes to the end.
+    def sort_key(task):
+        return task.get('due_date') or '9999-12-31'
+
+    # The sorted() function creates a NEW sorted list.
+    sorted_list = sorted(task_list, key=sort_key)
+
+    if not sorted_list:
+        print("Your to-do list is empty!")
+    else:
+        for index, task in enumerate(sorted_list):
+            status_marker = "[x]" if task['status'] == 'complete' else "[ ]"
+            due_date = task.get('due_date', 'No due date')
+            if due_date is None:
+                due_date = 'No due date'
+
+            print(f"{index + 1}. {status_marker} {task['description']} (Due: {due_date})")
+
 # Main application loop
 while True:
     show_menu()
-    choice = input("Enter your choice (1-6): ")
+    choice = input("Enter your choice (1-7): ")
 
     if choice == '1':
         add_task(tasks)
@@ -167,15 +191,17 @@ while True:
     elif choice == '2':
         view_tasks(tasks)
     elif choice == '3':
+        view_sorted_tasks(tasks)
+    elif choice == '4':
         mark_task_complete(tasks)
         save_tasks_to_file(tasks, FILENAME) # Save changes after marking a task complete
-    elif choice == '4':
+    elif choice == '5':
             edit_task(tasks)
             save_tasks_to_file(tasks, FILENAME) # Save changes after editing
-    elif choice == '5':
+    elif choice == '6':
             delete_task(tasks)
             save_tasks_to_file(tasks, FILENAME) # Save changes after deleting
-    elif choice == '6':
+    elif choice == '7':
         print("Exiting the To-Do List App. Goodbye!")
         break
     else:
