@@ -1,3 +1,4 @@
+import random
 import requests
 import datetime
 import json
@@ -7,6 +8,18 @@ print("Hello, To-Do List!")
 # Initialize our list of tasks
 tasks = []
 FILENAME = "tasks.json" # Define the filename as a constant
+
+# A list of mock suggestions to use if the API fails or is blocked.
+MOCK_SUGGESTIONS = [
+    "Learn a new programming language",
+    "Organize your bookshelf",
+    "Go for a 30-minute walk",
+    "Write a short story or poem",
+    "Try a new recipe",
+    "Listen to a new album from start to finish",
+    "Clean out your email inbox",
+    "Watch a documentary on a topic you know nothing about"
+]
 
 def show_menu():
     """Displays the main menu to the user."""
@@ -183,35 +196,26 @@ def view_sorted_tasks(task_list):
             print(f"{index + 1}. {status_marker} {task['description']} (Due: {due_date})")
 
 def suggest_task(task_list):
-    """Suggests a random task from the Bored API and asks to add it."""
+    """Suggests a random task from a local list and asks to add it."""
     print("\nGetting a task suggestion...")
-    try:
-        # Make the API call
-        response = requests.get("https://www.boredapi.com/api/activity")
-        # Raise an exception if the request was unsuccessful (e.g., 404, 500)
-        response.raise_for_status()
+    
+    # Pick a random suggestion from our mock list
+    suggestion = random.choice(MOCK_SUGGESTIONS)
 
-        # Get the JSON data from the response
-        data = response.json()
-        suggestion = data['activity']
-
-        print(f"API Suggestion: {suggestion}")
-        
-        add_it = input("Do you want to add this to your to-do list? (yes/no): ").lower()
-        
-        if add_it == 'yes':
-            new_task = {
-                "description": suggestion,
-                "status": "incomplete",
-                "due_date": None
-            }
-            task_list.append(new_task)
-            print(f"'{suggestion}' has been added to your list.")
-        else:
-            print("Suggestion discarded.")
-
-    except requests.exceptions.RequestException as e:
-        print(f"Could not connect to the API: {e}")
+    print(f"Suggestion: {suggestion}")
+    
+    add_it = input("Do you want to add this to your to-do list? (yes/no): ").lower()
+    
+    if add_it == 'yes':
+        new_task = {
+            "description": suggestion,
+            "status": "incomplete",
+            "due_date": None
+        }
+        task_list.append(new_task)
+        print(f"'{suggestion}' has been added to your list.")
+    else:
+        print("Suggestion discarded.")
 
 # Main application loop
 while True:
