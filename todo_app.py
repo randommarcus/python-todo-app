@@ -1,3 +1,4 @@
+import requests
 import datetime
 import json
 
@@ -16,7 +17,8 @@ def show_menu():
     print("4. Mark a task as complete")
     print("5. Edit a task")
     print("6. Delete a task")
-    print("7. Exit")
+    print("7. Suggest a random task")
+    print("8. Exit")
 
 def load_tasks_from_file(filename):
     """Loads tasks from a JSON file."""
@@ -180,10 +182,41 @@ def view_sorted_tasks(task_list):
 
             print(f"{index + 1}. {status_marker} {task['description']} (Due: {due_date})")
 
+def suggest_task(task_list):
+    """Suggests a random task from the Bored API and asks to add it."""
+    print("\nGetting a task suggestion...")
+    try:
+        # Make the API call
+        response = requests.get("https://www.boredapi.com/api/activity")
+        # Raise an exception if the request was unsuccessful (e.g., 404, 500)
+        response.raise_for_status()
+
+        # Get the JSON data from the response
+        data = response.json()
+        suggestion = data['activity']
+
+        print(f"API Suggestion: {suggestion}")
+        
+        add_it = input("Do you want to add this to your to-do list? (yes/no): ").lower()
+        
+        if add_it == 'yes':
+            new_task = {
+                "description": suggestion,
+                "status": "incomplete",
+                "due_date": None
+            }
+            task_list.append(new_task)
+            print(f"'{suggestion}' has been added to your list.")
+        else:
+            print("Suggestion discarded.")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Could not connect to the API: {e}")
+
 # Main application loop
 while True:
     show_menu()
-    choice = input("Enter your choice (1-7): ")
+    choice = input("Enter your choice (1-8): ")
 
     if choice == '1':
         add_task(tasks)
@@ -202,6 +235,9 @@ while True:
             delete_task(tasks)
             save_tasks_to_file(tasks, FILENAME) # Save changes after deleting
     elif choice == '7':
+        suggest_task(tasks)
+        save_tasks_to_file(tasks, FILENAME)
+    elif choice == '8':
         print("Exiting the To-Do List App. Goodbye!")
         break
     else:
