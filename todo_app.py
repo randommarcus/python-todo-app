@@ -220,31 +220,34 @@ def suggest_task(task_list):
         print("Suggestion discarded.")
 
 # Main application loop
-while True:
-    show_menu()
-    choice = input("Enter your choice (1-8): ")
+if __name__ == "__main__":
+    tasks = load_tasks_from_file(FILENAME)
+    
+    while True:
+        show_menu()
+        choice = input("Enter your choice (1-8): ")
 
-    if choice == '1':
-        add_task(tasks)
-        save_tasks_to_file(tasks, FILENAME) # Save after adding a task
-    elif choice == '2':
-        view_tasks(tasks)
-    elif choice == '3':
-        view_sorted_tasks(tasks)
-    elif choice == '4':
-        mark_task_complete(tasks)
-        save_tasks_to_file(tasks, FILENAME) # Save changes after marking a task complete
-    elif choice == '5':
-            edit_task(tasks)
-            save_tasks_to_file(tasks, FILENAME) # Save changes after editing
-    elif choice == '6':
-            delete_task(tasks)
-            save_tasks_to_file(tasks, FILENAME) # Save changes after deleting
-    elif choice == '7':
-        suggest_task(tasks)
-        save_tasks_to_file(tasks, FILENAME)
-    elif choice == '8':
-        print("Exiting the To-Do List App. Goodbye!")
-        break
-    else:
-        print("Invalid choice. Please enter a number between 1 and 4.")
+        if choice == '1':
+            add_task(tasks)
+            save_tasks_to_file(tasks, FILENAME) # Save after adding a task
+        elif choice == '2':
+            view_tasks(tasks)
+        elif choice == '3':
+            view_sorted_tasks(tasks)
+        elif choice == '4':
+            mark_task_complete(tasks)
+            save_tasks_to_file(tasks, FILENAME) # Save changes after marking a task complete
+        elif choice == '5':
+                edit_task(tasks)
+                save_tasks_to_file(tasks, FILENAME) # Save changes after editing
+        elif choice == '6':
+                delete_task(tasks)
+                save_tasks_to_file(tasks, FILENAME) # Save changes after deleting
+        elif choice == '7':
+            suggest_task(tasks)
+            save_tasks_to_file(tasks, FILENAME)
+        elif choice == '8':
+            print("Exiting the To-Do List App. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please enter a number between 1 and 4.")
